@@ -1,0 +1,41 @@
+parameters:
+  slnPath: ''
+  nugetFeedGuid: '7bc11f63-3a1b-488c-8652-322b2858ce02'
+  artifactName: 'Drop'
+
+steps:
+
+  - script: |
+      echo ##vso[task.setvariable variable=BuildOutputDirectory]$(Build.ArtifactStagingDirectory)\build
+
+  - script: |
+      echo ##vso[task.setvariable variable=PackageLocation]$(BuildOutputDirectory)\PackagedBuild.zip
+
+  - task: NuGetCommand@2
+    displayName: NuGet restore
+    inputs:
+      restoreSolution: ${{ parameters.slnPath }}
+      vstsFeed: ${{ parameters.nugetFeedGuid }}
+
+  - task: VSBuild@1
+    displayName: Build Solution
+    inputs:
+      solution: ${{ parameters.slnPath }}
+      msbuildArgs: '/p:DeployOnBuild=true
+                    /p:WebPublishMethod=Package
+                    /p:PackageAsSingleFile=true
+                    /p:SkipInvalidConfigurations=true
+                    /p:PackageLocation="$(PackageLocation)"
+                    /p:PackageTempRootDir=""'
+      configuration: Release
+
+  - task: VSTest@2
+    displayName: VsTest - testAssemblies
+    inputs:
+      codeCoverageEnabled: true
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Artifact
+    inputs:
+      PathtoPublish: '$(PackageLocation)'
+      ArtifactName: ${{ parameters.artifactName }}
