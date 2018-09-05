@@ -5,6 +5,8 @@ parameters:
 
 steps:
 
+  - script: echo Starting umbraco-ci template
+
   - script: |
       echo ##vso[task.setvariable variable=BuildOutputDirectory]$(Build.ArtifactStagingDirectory)\build
 
