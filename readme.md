@@ -31,8 +31,19 @@ steps:
 
 Making sure to set the slnPath appropriately. Replace <TAG NAME> with the tag in this GitHub repo you wish to target.
 
+You also need to create a github endpoint in the VSTS project called 'github-endpoint' if there isn't one already.
+
 You can add other steps before/after the template call as needed.
 But currently the template will publish artifacts, so we may need to change it as requirements become clear.
+
+## Gotchas
+Currently, authorization for the endpoint doesn't happen very seamlessly. You'll likely get a message complaining about this when you first run your YAML build.
+
+As documented [here](https://github.com/Microsoft/vsts-agent/blob/master/docs/preview/yamlgettingstarted-authz.md#resources) there is a workaround.
+- Edit your build from the VSTS UI
+- Change the default branch (in the Get sources step) to the feature branch you're trying to get the YAML build working on
+- Trigger the build: this should do the authorization
+- Change the default branch back (usually to develop)
 
 ## Advanced Parameters
 These params are optional:
